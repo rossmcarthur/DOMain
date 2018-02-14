@@ -201,7 +201,7 @@ class View {
 
     this.interval = window.setInterval(
       this.move.bind(this),
-      200
+      800
     );
 
     Object(__WEBPACK_IMPORTED_MODULE_1__DOM_DOMain_js__["a" /* default */])("body").on("keydown", this.handleKeyEvent.bind(this));
