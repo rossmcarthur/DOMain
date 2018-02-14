@@ -6,8 +6,17 @@ html, body, figure, figcaption, ul, li, h1 {
   text-align: inherit;
 }
 
+html {
+  width: 100%;
+  height: 100%;
+  background-image: url("Snake-Pit.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 ul {
   list-style: none;
+  background: white;
 }
 
 li {
@@ -22,6 +31,11 @@ ul:after {
   display: block;
 }
 
+h1 {
+  font-size: 80px;
+  font-family: 'Monofett', cursive;
+}
+
 .snake {
   background: black;
 }
@@ -30,8 +44,34 @@ ul:after {
   background: red;
 }
 
+body {
+  text-align: center;
+}
+
 figure {
   display: inline-block;
   border: 5px solid black;
   position: relative;
 }
+
+.information {
+  font-size: 20px;
+  font-family: 'Monofett', cursive;
+}
+
+.links {
+  font-size: 50px;
+ }
+
+.github {
+  color: white;
+}
+
+.website {
+  color: white;
+}
+ .linkedin {
+   margin-left: 100px;
+   margin-right: 100px;
+   color: white;
+ }

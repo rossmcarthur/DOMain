@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -68,7 +68,34 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__dom_node_collection__ = __webpack_require__(6);
+class Coord {
+  constructor(x, y) {
+      this.x = x;
+      this.y = y;
+  }
+
+  plus(coord2) {
+    return  new Coord(this.x + coord2.x, this.y + coord2.y);
+  }
+
+  equals(coord2) {
+    return (this.x === coord2.x) && (this.y === coord2.y);
+  }
+
+  isOpposite(coord2) {
+    return ((-(this.x) == (coord2.x)) && (-(this.y) == (coord2.y)));
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Coord);
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__dom_node_collection__ = __webpack_require__(7);
 
 
 const fncs = [];
@@ -137,32 +164,32 @@ let stateCheck = setInterval(() => {
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__view__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DOMain_js__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__view__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DOM_DOMain_js__ = __webpack_require__(1);
 
 
 
-Object(__WEBPACK_IMPORTED_MODULE_1__DOMain_js__["a" /* default */])(()=> {
+Object(__WEBPACK_IMPORTED_MODULE_1__DOM_DOMain_js__["a" /* default */])(()=> {
   const rootEl = $('.game');
   const game = new __WEBPACK_IMPORTED_MODULE_0__view__["a" /* default */](rootEl);
   game.setupGrid();
 });
 
-window.$l = __WEBPACK_IMPORTED_MODULE_1__DOMain_js__["a" /* default */];
+window.$l = __WEBPACK_IMPORTED_MODULE_1__DOM_DOMain_js__["a" /* default */];
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__board_js__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DOMain_js__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__board_js__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DOM_DOMain_js__ = __webpack_require__(1);
 
 
 
@@ -174,10 +201,10 @@ class View {
 
     this.interval = window.setInterval(
       this.move.bind(this),
-      1000
+      200
     );
 
-    Object(__WEBPACK_IMPORTED_MODULE_1__DOMain_js__["a" /* default */])("body").on("keydown", this.handleKeyEvent.bind(this));
+    Object(__WEBPACK_IMPORTED_MODULE_1__DOM_DOMain_js__["a" /* default */])("body").on("keydown", this.handleKeyEvent.bind(this));
   }
 
   handleKeyEvent(e) {
@@ -221,8 +248,6 @@ class View {
     if (this.board.snake.segments.length > 0) {
       this.board.snake.move();
       this.render();
-    } else {
-      alert("Game Over!");
     }
   }
 }
@@ -238,12 +263,12 @@ View.KEYS = {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__snake__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__apple__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__snake__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__apple__ = __webpack_require__(6);
 
 
 class Board {
@@ -283,6 +308,13 @@ class Board {
     }).join("\n");
   }
 
+  valid(coords) {
+    if (coords.x < this.size && coords.x >= 0 && coords.y < this.size && coords.y >= 0) {
+      return true;
+    }
+    return false;
+  }
+
 }
 
 Board.EMPTY = ".";
@@ -291,11 +323,11 @@ Board.EMPTY = ".";
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__coord__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__coord__ = __webpack_require__(0);
 
 
 class Snake {
@@ -304,11 +336,34 @@ class Snake {
     this.board = board;
     const cent = new __WEBPACK_IMPORTED_MODULE_0__coord__["a" /* default */](10, 10);
     this.segments = [cent];
-    this.addLength = false;
+    this.addLength = 0;
+  }
+
+  collides() {
+    if (!this.board.valid(this.head())) {
+      return false;
+    }
+
+  for(let i = 0; i < this.segments.length - 1; i++) {
+    if (this.segments[i].equals(this.head())) {
+      return false;
+    }
+  }
+
+    return true;
   }
 
   head() {
     return this.segments[this.segments.length - 1];
+  }
+
+  eat() {
+    if (this.head().equals(this.board.apple.pos)) {
+      this.addLength = 2;
+      return true;
+    } else {
+      return false;
+    }
   }
 
   occupied(coords) {
@@ -325,9 +380,22 @@ class Snake {
 
   move() {
     this.segments.push(this.head().plus(Snake.MOVEMENTS[this.direction]));
-    if (!this.addLength) {
+
+    if (this.eat()) {
+      this.board.apple.create();
+    }
+
+    if (this.addLength > 0) {
+      this.addLength -= 1;
+    } else {
       this.segments.shift();
-    } 
+    }
+
+    if (!this.collides()) {
+      this.segments = [];
+      alert("YOU DIED!");
+
+    }
 
   }
 
@@ -352,34 +420,37 @@ Snake.MOVEMENTS = {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-class Coord {
-  constructor(x, y) {
-      this.x = x;
-      this.y = y;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__coord__ = __webpack_require__(0);
+
+
+class Apple {
+  constructor(board) {
+    this.board = board;
+    this.create();
   }
 
-  plus(coord2) {
-    return  new Coord(this.x + coord2.x, this.y + coord2.y);
+  create() {
+    let x = Math.floor(Math.random() * this.board.size);
+    let y = Math.floor(Math.random() * this.board.size);
+
+    while (this.board.snake.occupied([x, y])) {
+      x = Math.floor(Math.random() * this.board.size);
+      y = Math.floor(Math.random() * this.board.size);
+    }
+    this.pos = new __WEBPACK_IMPORTED_MODULE_0__coord__["a" /* default */](x, y);
   }
 
-  equals(coord2) {
-    return (this.x === coord2.x) && (this.y === coord2.y);
-  }
-
-  isOpposite(coord2) {
-    return ((-(this.x) == (coord2.x)) && (-(this.y) == (coord2.y)));
-  }
 }
 
-/* harmony default export */ __webpack_exports__["a"] = (Coord);
+/* harmony default export */ __webpack_exports__["a"] = (Apple);
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -501,37 +572,6 @@ class DOM_Node_Collection {
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (DOM_Node_Collection);
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__coord__ = __webpack_require__(5);
-
-
-class Apple {
-  constructor(board) {
-    this.board = board;
-    this.create();
-  }
-
-  create() {
-    let x = Math.floor(Math.random() * this.board.size);
-    let y = Math.floor(Math.random() * this.board.size);
-
-    while (this.board.snake.occupied([x, y])) {
-      x = Math.floor(Math.random() * this.board.size);
-      y = Math.floor(Math.random() * this.board.size);
-    }
-    debugger
-    this.pos = new __WEBPACK_IMPORTED_MODULE_0__coord__["a" /* default */](x, y);
-  }
-
-}
-
-/* harmony default export */ __webpack_exports__["a"] = (Apple);
 
 
 /***/ })
