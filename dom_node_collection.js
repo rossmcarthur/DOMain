@@ -7,13 +7,13 @@ class DOM_Node_Collection {
     this.htmlArray.forEach(cb);
   }
 
-  html(str) {
-    if (str === undefined) {
-      return this.htmlArray[0].innerHTML;
-    } else {
-      this.each(el => {
-        el.innerHTML = str;
+  html(html) {
+    if (typeof html === "string") {
+      this.each((node) => {
+        node.innerHTML = html;
       });
+    } else if (this.htmlArray.length > 0) {
+      return this.htmlArray[0].innerHTML;
     }
   }
 
@@ -58,7 +58,7 @@ class DOM_Node_Collection {
   }
 
   removeClass(value) {
-    this.htmlArray.each(el => {
+    this.each(el => {
         el.classList.remove(value);
     });
     return this;
@@ -83,9 +83,10 @@ class DOM_Node_Collection {
   }
 
   find(value) {
-    const foundArr = [];
+    let foundArr = [];
     this.each(el => {
-      foundArr.push(...el.querySelectorAll(value));
+      const nodeList = el.querySelectorAll(value);
+      foundArr = foundArr.concat(Array.from(nodeList));
     });
     return new DOM_Node_Collection(foundArr);
   }
@@ -114,4 +115,4 @@ class DOM_Node_Collection {
 
 }
 
-export default DOMNodeCollection;
+export default DOM_Node_Collection;

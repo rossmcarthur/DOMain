@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -68,8 +68,7 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__dom_node_collection__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__dom_node_collection__ = __webpack_require__(6);
 
 
 const fncs = [];
@@ -78,16 +77,21 @@ const $l = arg => {
   let result = [];
 
   if (typeof arg === "string") {
-    const nodeList = document.querySelectorAll(arg);
-    result = new DOM_Node_Collection(nodeList);
+    return getNodesFromDom(arg);
 
   } else if (arg instanceof HTMLElement) {
-    result = new DOM_Node_Collection([arg]);
+    result = new __WEBPACK_IMPORTED_MODULE_0__dom_node_collection__["a" /* default */]([arg]);
 
   } else if (typeof arg === "function") {
     fncs.push(arg);
   }
   return result;
+};
+
+const getNodesFromDom = (selector) => {
+  const nodes = document.querySelectorAll(selector);
+  const nodesArray = Array.from(nodes);
+  return new __WEBPACK_IMPORTED_MODULE_0__dom_node_collection__["a" /* default */](nodesArray);
 };
 
 $l.ajax = options => {
@@ -119,7 +123,6 @@ $l.extend = function (...args) {
   return Object.assign(...args);
 };
 
-window.$l = $l;
 
 let stateCheck = setInterval(() => {
   if (document.readyState === 'complete') {
@@ -130,9 +133,253 @@ let stateCheck = setInterval(() => {
   }
 }, 100);
 
+/* harmony default export */ __webpack_exports__["a"] = ($l);
+
 
 /***/ }),
 /* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__view__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DOMain_js__ = __webpack_require__(0);
+
+
+
+Object(__WEBPACK_IMPORTED_MODULE_1__DOMain_js__["a" /* default */])(()=> {
+  const rootEl = $('.game');
+  const game = new __WEBPACK_IMPORTED_MODULE_0__view__["a" /* default */](rootEl);
+  game.setupGrid();
+});
+
+window.$l = __WEBPACK_IMPORTED_MODULE_1__DOMain_js__["a" /* default */];
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__board_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DOMain_js__ = __webpack_require__(0);
+
+
+
+class View {
+  constructor($root) {
+    this.$root = $root;
+
+    this.board = new __WEBPACK_IMPORTED_MODULE_0__board_js__["a" /* default */](20);
+
+    this.interval = window.setInterval(
+      this.move.bind(this),
+      1000
+    );
+
+    Object(__WEBPACK_IMPORTED_MODULE_1__DOMain_js__["a" /* default */])("body").on("keydown", this.handleKeyEvent.bind(this));
+  }
+
+  handleKeyEvent(e) {
+    const movement = View.KEYS[e.keyCode];
+    if (movement) {
+      this.board.snake.turn(movement);
+    }
+  }
+
+  render() {
+    this.updateClasses(this.board.snake.segments, "snake");
+    this.updateClasses([this.board.apple.pos], "apple");
+  }
+
+  updateClasses(coords, _class) {
+    this.$li.removeClass(`${_class}`);
+
+    coords.forEach(coord => {
+      const flat = (coord.x * this.board.size) + coord.y;
+      if (this.$li.eq(flat)) {
+      this.$li.eq(flat).addClass(_class);
+    }
+    });
+  }
+
+  setupGrid() {
+    let html = "";
+
+    for(let i = 0; i < this.board.size; i++) {
+      html += "<ul>";
+      for(let j = 0; j < this.board.size; j++) {
+        html += "<li></li>";
+      }
+      html += "</ul>";
+    }
+    this.$root.html(html);
+    this.$li = this.$root.find("li");
+  }
+
+  move() {
+    if (this.board.snake.segments.length > 0) {
+      this.board.snake.move();
+      this.render();
+    } else {
+      alert("Game Over!");
+    }
+  }
+}
+
+View.KEYS = {
+  38: "U",
+  39: "R",
+  40: "D",
+  37: "L"
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (View);
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__snake__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__apple__ = __webpack_require__(7);
+
+
+class Board {
+
+  constructor(size) {
+    this.size = size;
+    this.snake = new __WEBPACK_IMPORTED_MODULE_0__snake__["a" /* default */](this);
+    this.apple = new __WEBPACK_IMPORTED_MODULE_1__apple__["a" /* default */](this);
+
+  }
+
+  blankGrid(size) {
+    const grid = [];
+
+    for(let i = 0; i < size; i++) {
+      let row = [];
+      for (let j = 0; j < dim; j++) {
+        row.push(Board.EMPTY);
+      }
+      grid.push(row);
+    }
+    return grid;
+  }
+
+  render() {
+    const grid = Board.blankGrid(this.size);
+
+    this.snake.segments.forEach( seg => {
+      grid[seg.x][seg.y] = "X";
+    });
+
+    grid[this.apple.pos.x][this.apple.pos.y] = "A";
+
+    const rows = [];
+    grid.map( row => {
+      return row.join("");
+    }).join("\n");
+  }
+
+}
+
+Board.EMPTY = ".";
+
+/* harmony default export */ __webpack_exports__["a"] = (Board);
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__coord__ = __webpack_require__(5);
+
+
+class Snake {
+  constructor(board) {
+    this.direction = "D";
+    this.board = board;
+    const cent = new __WEBPACK_IMPORTED_MODULE_0__coord__["a" /* default */](10, 10);
+    this.segments = [cent];
+    this.addLength = false;
+  }
+
+  head() {
+    return this.segments[this.segments.length - 1];
+  }
+
+  occupied(coords) {
+    let result = false;
+    for(let i = 0; i < this.segments.length; i++) {
+      const snakeCoords = this.segments[i];
+      if (snakeCoords.x === coords[0] && snakeCoords.y === coords[1]) {
+        result = true;
+        return result;
+      }
+    }
+    return result;
+  }
+
+  move() {
+    this.segments.push(this.head().plus(Snake.MOVEMENTS[this.direction]));
+    if (!this.addLength) {
+      this.segments.shift();
+    } 
+
+  }
+
+  turn(direction) {
+    if (Snake.MOVEMENTS[this.direction].isOpposite(Snake.MOVEMENTS[direction])) {
+      return;
+    } else {
+      this.direction = direction;
+    }
+  }
+
+}
+
+Snake.MOVEMENTS = {
+  "U": new __WEBPACK_IMPORTED_MODULE_0__coord__["a" /* default */](-1, 0),
+  "R": new __WEBPACK_IMPORTED_MODULE_0__coord__["a" /* default */](0, 1),
+  "D": new __WEBPACK_IMPORTED_MODULE_0__coord__["a" /* default */](1, 0),
+  "L": new __WEBPACK_IMPORTED_MODULE_0__coord__["a" /* default */](0, -1)
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (Snake);
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class Coord {
+  constructor(x, y) {
+      this.x = x;
+      this.y = y;
+  }
+
+  plus(coord2) {
+    return  new Coord(this.x + coord2.x, this.y + coord2.y);
+  }
+
+  equals(coord2) {
+    return (this.x === coord2.x) && (this.y === coord2.y);
+  }
+
+  isOpposite(coord2) {
+    return ((-(this.x) == (coord2.x)) && (-(this.y) == (coord2.y)));
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Coord);
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -145,13 +392,13 @@ class DOM_Node_Collection {
     this.htmlArray.forEach(cb);
   }
 
-  html(str) {
-    if (str === undefined) {
-      return this.htmlArray[0].innerHTML;
-    } else {
-      this.each(el => {
-        el.innerHTML = str;
+  html(html) {
+    if (typeof html === "string") {
+      this.each((node) => {
+        node.innerHTML = html;
       });
+    } else if (this.htmlArray.length > 0) {
+      return this.htmlArray[0].innerHTML;
     }
   }
 
@@ -196,7 +443,7 @@ class DOM_Node_Collection {
   }
 
   removeClass(value) {
-    this.htmlArray.each(el => {
+    this.each(el => {
         el.classList.remove(value);
     });
     return this;
@@ -221,9 +468,10 @@ class DOM_Node_Collection {
   }
 
   find(value) {
-    const foundArr = [];
+    let foundArr = [];
     this.each(el => {
-      foundArr.push(...el.querySelectorAll(value));
+      const nodeList = el.querySelectorAll(value);
+      foundArr = foundArr.concat(Array.from(nodeList));
     });
     return new DOM_Node_Collection(foundArr);
   }
@@ -252,7 +500,38 @@ class DOM_Node_Collection {
 
 }
 
-/* unused harmony default export */ var _unused_webpack_default_export = (DOMNodeCollection);
+/* harmony default export */ __webpack_exports__["a"] = (DOM_Node_Collection);
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__coord__ = __webpack_require__(5);
+
+
+class Apple {
+  constructor(board) {
+    this.board = board;
+    this.create();
+  }
+
+  create() {
+    let x = Math.floor(Math.random() * this.board.size);
+    let y = Math.floor(Math.random() * this.board.size);
+
+    while (this.board.snake.occupied([x, y])) {
+      x = Math.floor(Math.random() * this.board.size);
+      y = Math.floor(Math.random() * this.board.size);
+    }
+    debugger
+    this.pos = new __WEBPACK_IMPORTED_MODULE_0__coord__["a" /* default */](x, y);
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Apple);
 
 
 /***/ })

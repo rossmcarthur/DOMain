@@ -1,0 +1,25 @@
+{
+  "name": "DOMain",
+  "version": "1.0.0",
+  "description": "",
+  "main": "DOMain.js",
+  "dependencies": {
+    "webpack": "^3.10.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "webpack": "webpack --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rossmcarthur/DOMain.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rossmcarthur/DOMain/issues"
+  },
+  "homepage": "https://github.com/rossmcarthur/DOMain#readme"
+}

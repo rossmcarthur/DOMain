@@ -1,4 +1,4 @@
-import DOMNodeCollection from './dom_node_collection';
+import DOM_Node_Collection from './dom_node_collection';
 
 const fncs = [];
 
@@ -6,8 +6,7 @@ const $l = arg => {
   let result = [];
 
   if (typeof arg === "string") {
-    const nodeList = document.querySelectorAll(arg);
-    result = new DOM_Node_Collection(nodeList);
+    return getNodesFromDom(arg);
 
   } else if (arg instanceof HTMLElement) {
     result = new DOM_Node_Collection([arg]);
@@ -16,6 +15,12 @@ const $l = arg => {
     fncs.push(arg);
   }
   return result;
+};
+
+const getNodesFromDom = (selector) => {
+  const nodes = document.querySelectorAll(selector);
+  const nodesArray = Array.from(nodes);
+  return new DOM_Node_Collection(nodesArray);
 };
 
 $l.ajax = options => {
@@ -47,7 +52,6 @@ $l.extend = function (...args) {
   return Object.assign(...args);
 };
 
-window.$l = $l;
 
 let stateCheck = setInterval(() => {
   if (document.readyState === 'complete') {
@@ -57,3 +61,5 @@ let stateCheck = setInterval(() => {
     clearInterval(stateCheck);
   }
 }, 100);
+
+export default $l;

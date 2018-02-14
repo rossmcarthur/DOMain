@@ -1,5 +1,5 @@
 module.exports = {
-  entry: "./DOMain.js",
+  entry: "./main.js",
   output: {
     path: __dirname,
     filename: "./jquery_lite.js"

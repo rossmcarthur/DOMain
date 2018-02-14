@@ -5,9 +5,7 @@ class Coord {
   }
 
   plus(coord2) {
-    const newCoords = (this.x + coord2.x, this.y + coord2.y);
-    return newCoords;
-
+    return  new Coord(this.x + coord2.x, this.y + coord2.y);
   }
 
   equals(coord2) {
